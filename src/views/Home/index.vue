@@ -1,4 +1,4 @@
 <template>
-	<section>page5...
+	<section>首页
 	</section>
 </template>

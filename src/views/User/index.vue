@@ -1,4 +1,4 @@
 <template>
-	<section>page6...
+	<section>插件
 	</section>
 </template>
