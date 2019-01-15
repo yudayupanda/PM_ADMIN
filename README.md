@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 **demo**: [https://taylorchen709.github.io/vue-admin/](https://taylorchen709.github.io/vue-admin/)
 
 # To start
@@ -55,3 +56,7 @@ Modern browsers and IE 10+.
 
 # License
 [MIT](http://opensource.org/licenses/MIT)
+=======
+# PM_ADMIN
+流程挖掘管理平台前端代码
+>>>>>>> d7da93c9d0392027682ccea560c3523e3241c21c
