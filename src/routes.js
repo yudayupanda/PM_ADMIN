@@ -1,8 +1,7 @@
 import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Layout from './views/Layout/index.vue'
-import Table from './views/User/Table.vue'
-import Form from './views/User/Form.vue'
+
 import Home from './views/Home/index.vue'
 import User from './views/User/index.vue'
 
@@ -38,7 +37,7 @@ let routes = [
         iconCls: 'fa fa-address-card',
         leaf: true,//只有一个节点
         children: [
-            { path: '/user', component: Table, name: '用户管理' }
+            { path: '/user', component: User, name: '用户管理' }
         ]
     },
     
@@ -52,11 +51,7 @@ let routes = [
         children:[
             {path:'/plugin',component:Plugin,name:'插件管理'}
         ]
-        // children: [
-        //     { path: '/merge-alogorithms', component: MergeAlogorithms, name: '融合算法' },
-        //     { path: '/mine-alogorithms', component: MineAlogorithms, name: '挖掘算法' },
-          
-        // ]
+
     },
     
    

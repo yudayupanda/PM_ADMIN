@@ -2,7 +2,7 @@
 <template>
 	<div id="sidebar" :class={collapsed:isCollapsed}>
 		<div class="logo">
-			{{isCollapsed?'':'PM ADMIN'}}
+			{{isCollapsed?'PM':'PM ADMIN'}}
 		</div>
 		<!--导航菜单-->
 		

@@ -4,6 +4,15 @@
 // 引入axios以及element ui中的loading和message组件
 import axios from 'axios'
 import { Loading, Message,Notification } from 'element-ui'
+const service = axios.create({
+    baseURL: 'http://localhost:8080/;',
+})
+// service.interceptors.request.use(config => {
+//     return config
+// }, error => {
+//     console.log(error)
+//     Promise.reject(error)
+// })
 // // 超时时间
 // axios.defaults.timeout = 5000
 // // http请求拦截器

@@ -32,23 +32,20 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   //测试，直接跳转到首页
   NProgress.start();
-  next()
-  NProgress.done()
-  // if (to.path == '/login') {
-  //   sessionStorage.removeItem('user');
-  // }
-  // let user = JSON.parse(sessionStorage.getItem('user'));
-  // if (!user && to.path != '/login') {
-  //   next({ path: '/login' })
-  // } else {
-  //   next()
-  //    NProgress.done()
-  // }
+  if (to.path == '/login') {
+    sessionStorage.removeItem('user');
+  }
+  let user = JSON.parse(sessionStorage.getItem('user'));
+  if (!user && to.path != '/login') {
+    next({ path: '/login' })
+  } else {
+    next()
+  }
 })
 
 router.afterEach(transition => {
   NProgress.done();
-});
+})
 
 new Vue({
   //el: '#app',
