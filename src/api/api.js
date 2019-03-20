@@ -26,14 +26,21 @@ export const queryAlgorithms = params => {
   return axios.get(`${base}/algorithmAction/listAll`, {}).then(res => res.data).catch(function (error) {
   })
 }
+//获取算法执行函数参数信息
+export const getAlgorithmInfo = params => {
+  return axios.get(`${base}/algorithmAction/getConfig`, { params }).then(res => res.data).catch(function (error) {
+  })
+}
 //上传Jar插件获取其中的包名，类名，方法等信息,记：参数params不需要转换成json
 export const upload = params => {
     return axios.post(`${base}/algorithmAction/upload`,params).then(res=>res.data).catch(function (error) {
     })
 }
+
+
 //删除算法
 export const deleteAlgorithm = params => {
-  return axios.get(`${base}/algorithmAction/delete`, {}).then(res => res.data).catch(function (error) {
+  return axios.get(`${base}/algorithmAction/delete`, {params}).then(res => res.data).catch(function (error) {
   })
 }
 
@@ -42,4 +49,19 @@ export const updateAlgorithmAvailable = params=>{
 	return axios.post(`${base}/algorithmAction/updateAlgorithmAvailable`, qs.stringify(params)).then(res => res.data).catch(function (error) {
   })
 }
+
+//查询所有的挖掘算法
+export const queryMineAlgorithms = params => {
+  return axios.get(`${base}/algorithmAction/listAvailable`, {}).then(res => res.data).catch(function (error) {
+  })
+}
+
+//挖掘用户自上传的事件日志
+export const mineLogByUserUpload = params => {
+    return axios.post(`${base}/miningAction/mineLogByUserUpload`,params).then(res=>res.data).catch(function (error) {
+    })
+}
+
+
+
 

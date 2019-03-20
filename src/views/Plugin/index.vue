@@ -29,7 +29,7 @@
 		      prop="algorithmName"
 		      >
 		    </el-table-column>
-		    <el-table-column
+		  <!--   <el-table-column
 		      prop="algorithmType"
 		      label="类别" 
 		      width="200"
@@ -40,11 +40,8 @@
 		      		<div class="algorithm-label">
 		      		{{scope.row.algorithmType?'挖':'融'}}
 		      		</div>
-		       <!--  <el-tag
-		          :type="scope.row.tag === '家' ? 'primary' : 'success'"
-		          disable-transitions>{{scope.row.tag}}</el-tag> -->
 		      	</template>
-    		</el-table-column>
+    		</el-table-column> -->
 		    <el-table-column
 		      label="描述"
 		      prop="algorithmInformation">
@@ -123,21 +120,22 @@
 		          placeholder="输入关键字搜索"/>
 		     </template>
 		    <template slot-scope="scope">
-		      	<!-- <el-button
+		      	<el-button
 		          size="mini"
-		          @click="handleEdit(scope.$index, scope.row)">检查
-		        </el-button> -->
-		        <el-button
-		          size="mini"
-		          @click="handleEdit(scope.$index, scope.row)">设置
+		          @click="downloadAlgorithm(scope.$index)" :loading="isDownloading">下载
 		        </el-button>
 		        <el-button
 		          size="mini"
-		          @click="deleteAlgorithm(scope.$index)">删除</el-button>
+		          @click="update(scope.$index)">设置
+		        </el-button>
+		        <el-button
+		          size="mini"
+
+		          @click="deleteAlgorithm(scope.$index)" >删除</el-button>
 		      </template>
 		    </el-table-column>
   		</el-table>
-  		<el-dialog width="30%" title="上传插件" :visible.sync="uploadForm.visible" :modal-append-to-body="false" @opened="dialogOpen()" @closed="closeUploadJarDialog()">
+  		<el-dialog width="30%" title="上传算法" :visible.sync="uploadForm.visible" :modal-append-to-body="false" @opened="dialogOpen()" @closed="closeUploadJarDialog()">
   			<el-form :model="uploadForm" ref="uploadForm" style="margin: 0 auto;width:100%;" >
   				<el-upload 
   					ref="upload" 
@@ -149,7 +147,6 @@
   					:file-list="uploadForm.fileList" 
   					:before-upload="uploadFile"
   					:on-change="changeJar"
-  					
   					:limit="1"
   					>   
 		          <div class="file-uploader"  v-bind:style="{width: uploadForm.select_file_area_width+'px'}">
@@ -171,38 +168,23 @@
     				</li>
     			</ul>
 		    </el-form>
-		<!--     <div v-if="isAlgorithmVisible"> -->
-
 			<div>
 				<div style="margin-top: 10px;">
-
 					<el-input type="file" id="select_json_btn" style="display:none" @change="uploadConfigJson()"/>
-					<div class="setting-icon light-setting-icon"  title="重置" @click="resetAllForms()">
+					<div class="setting-icon light-setting-icon"  title="重置" @click="resetUploadForms()">
 						<svg-icon icon-class="reset" style="font-size:28px;margin-top:2px;"></svg-icon>
 					</div>
 					<div class="setting-icon light-setting-icon"  title="导入配置文件" @click="openImportJsonDialog">
 						<svg-icon icon-class="json" style="font-size:28px;margin-top:2px;"></svg-icon>
 					</div>
 				</div>
-				<!-- <el-card>
-					<svg-icon icon-class="reset"></svg-icon>
-					
-					<svg-icon icon-class="import"></svg-icon>
-				</el-card> -->
-				<!-- <div style="width: 100%;height: 30px;text-align: right;font-size:25px;">
-					
-				</div> -->
-				<!-- <div class="tip-label">
-					<svg-icon icon-class="reset"></svg-icon>
-					
-					<svg-icon icon-class="import"></svg-icon>
-				</div> -->
-		    	<div class="tip-label" style="margin-top: 10px;" @click="isBaseInfoPanelActive=!isBaseInfoPanelActive">
+		
+		    	<div class="tip-label" style="margin-top: 10px;" @click="uploadForm.isBaseInfoPanelActive=!uploadForm.isBaseInfoPanelActive">
 		    		基本信息
-		    		<i :class="[{'el-collapse-item__arrow el-icon-arrow-right is-active':isBaseInfoPanelActive},inactiveLogoClass]" style="float: right;"></i>
+		    		<i :class="[{'el-collapse-item__arrow el-icon-arrow-right is-active':uploadForm.isBaseInfoPanelActive},inactiveLogoClass]" style="float: right;"></i>
 		    	</div>
 		    	<el-collapse-transition>
-		    		<div v-show="isBaseInfoPanelActive">
+		    		<div v-show="uploadForm.isBaseInfoPanelActive">
 					    <el-form  :model="algorithmInfoForm" :rules="algorithmBaseInfoRules" ref="algorithmInfoForm" label-width="100px" class="demo-ruleForm" label-position="left">
 					    	<el-form-item label="算法名称" prop="name">
 					    		<el-input v-model = "algorithmInfoForm.name"></el-input>
@@ -213,26 +195,18 @@
 					    	<el-form-item  class="notNeedValid" label="算法描述" prop="description">
 					    		<el-input style="margin-left: -8px;" type="textarea" v-model="algorithmInfoForm.description"></el-input>
 					    	</el-form-item>
-					    	<el-form-item label="算法类型" prop="type">
-					    		<el-radio-group v-model="algorithmInfoForm.type">
-							      <el-radio label="融合算法" value="0"></el-radio>
-							      <el-radio label="挖掘算法" value="1"></el-radio>
-							    </el-radio-group>	
-					    	</el-form-item>
 					    </el-form>
 			    	</div>
 				</el-collapse-transition>
-			    <div class="tip-label" @click="isRunTimeInfoPanelActive=!isRunTimeInfoPanelActive">
+			    <div class="tip-label" @click="uploadForm.isRunTimeInfoPanelActive=!uploadForm.isRunTimeInfoPanelActive">
 		    		运行信息
-		    		<i :class="[{'el-collapse-item__arrow el-icon-arrow-right is-active':isRunTimeInfoPanelActive},inactiveLogoClass]" style="float: right;"></i>
+		    		<i :class="[{'el-collapse-item__arrow el-icon-arrow-right is-active':uploadForm.isRunTimeInfoPanelActive},inactiveLogoClass]" style="float: right;"></i>
 		    	</div>
 		    	<el-collapse-transition>
-		    		<div v-show="isRunTimeInfoPanelActive">
+		    		<div v-show="uploadForm.isRunTimeInfoPanelActive">
 		    			<el-table style="width=100%" :data="runTimeInfoForm.runInfoTable">
 				    		<el-table-column label="包名">
 				    			<template slot-scope="scope">
-				    				<!-- <el-select filterable v-model="algorithmInfoForm.runInfoTable.packageName" placeholder="请选择包">
-				    				</el-select> -->
 				    				<el-form :model="scope.row" :rules="algRunTimeInfoRules" ref="packageNameForm">
 				    					<el-form-item prop="packageName" style="margin-bottom: 16px;">
 				    						<el-input v-model="scope.row.packageName"  placeholder="请输入包名"/>
@@ -266,7 +240,7 @@
 				    			<template slot-scope="scope" >
 				    				<el-form :model="scope.row" :rules="algParameterRules" ref="parameterNameForm">
 					    				<el-form-item prop="parameterName" style="margin-bottom: 16px;" >
-					    				 	<el-input v-model="scope.row.parameterName"  @focus="addOneRowParameter" placeholder="请输入参数名称"/>
+					    				 	<el-input v-model="scope.row.parameterName"  placeholder="请输入参数名称"/>
 					    				</el-form-item>
 				    				</el-form>
 				    			</template>
@@ -304,29 +278,163 @@
 				    		</el-table-column>
 			    		</el-table>  
 		    		</div>
-		    	</el-collapse-transition>
-			    	<!-- <el-form-item label="包名">
-			    		<el-select v-model="algorithmInfoForm.packageName" placeholder="请选择包">
-			    		</el-select>
-			    	</el-form-item>
-			    	<el-form-item label="类名">
-			    		<el-select v-model="algorithmInfoForm.className" placeholder="请选择类">
-			    		</el-select>
-			    	</el-form-item>
-			    	<el-form-item label="方法名">
-			    		<el-select v-model="algorithmInfoForm.className" placeholder="请选择方法">
-			    		</el-select>
-			    	</el-form-item> -->
-			 <!--    <el-form :model="runTimeInfoForm"  ref="runTimeInfoForm" :rules="algRunTimeInfoRules"> -->
-			    	  	
-		    	
-		    </div>
-		 
-		    		
+		    	</el-collapse-transition>			    
+		    </div> 		
 	        <div slot="footer" class="dialog-footer">
 	        	<el-button @click="uploadForm.visible = false">取 消</el-button>
 	        	<!-- <el-button type="primary" @click="submitUpload()">确 定</el-button> -->
-	        	<el-button type="primary" @click="submitUpload()" :loading="uploadForm.isUploading">上传</el-button>
+	        	<el-button type="primary" @click="submitUpload(true)" :loading="uploadForm.isUploading">上 传</el-button>
+	        </div>
+  		</el-dialog>
+  		<el-dialog width="30%" title="更新算法" :visible.sync="updateForm.visible" :modal-append-to-body="false"  @closed="closeUploadJarDialog()">
+  			<el-form :model="uploadForm" ref="uploadForm" style="margin: 0 auto;width:100%;" >
+  				<el-upload 
+  					ref="upload" 
+  					class="upload-demo" 
+  					action="" 
+  					:show-file-list="true"
+  					accept="jar"  
+  					:auto-upload="false" 
+  					:file-list="uploadForm.fileList" 
+  					:before-upload="uploadFile"
+  					:on-change="changeJar"
+  					:limit="1"
+  					>   
+		          <div class="file-uploader"  v-bind:style="{width: uploadForm.select_file_area_width+'px'}">
+		          	<span class="svg-container">
+		           		<svg-icon icon-class="upload"></svg-icon>
+		           	</span>		         
+		           	 <div class="el-upload__text">重新上传Jar文件</div>
+		          </div>
+		          <div class="error__tip" slot="tip" v-if="uploadForm.isFileListEmpty">请上传文件</div>
+		        </el-upload>
+		        <ul class="el-upload-list el-upload-list--text" v-if="uploadForm.isuploadSuccessed">
+		        	<li tabindex="0" class="el-upload-list__item is-ready">
+		        		<a class="el-upload-list__item-name">
+		        			<i class="el-icon-document"></i>{{uploadForm.file.name}}
+    					</a>
+    					<label class="el-upload-list__item-status-label" style="display: inline-block;">
+    						<i class="el-icon-upload-success el-icon-circle-check"></i>
+    					</label>
+    				</li>
+    			</ul>
+		    </el-form>
+			<div>
+				<div style="margin-top: 10px;">
+					<el-input type="file" id="select_json_btn" style="display:none" @change="uploadConfigJson()"/>
+					<div class="setting-icon light-setting-icon"  title="重置" @click="resetUploadForms()">
+						<svg-icon icon-class="reset" style="font-size:28px;margin-top:2px;"></svg-icon>
+					</div>
+					<div class="setting-icon light-setting-icon"  title="导入配置文件" @click="openImportJsonDialog">
+						<svg-icon icon-class="json" style="font-size:28px;margin-top:2px;"></svg-icon>
+					</div>
+				</div>
+		
+		    	<div class="tip-label" style="margin-top: 10px;" @click="uploadForm.isBaseInfoPanelActive=!uploadForm.isBaseInfoPanelActive">
+		    		基本信息
+		    		<i :class="[{'el-collapse-item__arrow el-icon-arrow-right is-active':uploadForm.isBaseInfoPanelActive},inactiveLogoClass]" style="float: right;"></i>
+		    	</div>
+		    	<el-collapse-transition>
+		    		<div v-show="uploadForm.isBaseInfoPanelActive">
+					    <el-form  :model="algorithmInfoForm" :rules="algorithmBaseInfoRules" ref="algorithmInfoForm" label-width="100px" class="demo-ruleForm" label-position="left">
+					    	<el-form-item label="算法名称" prop="name">
+					    		<el-input v-model = "algorithmInfoForm.name"></el-input>
+					    	</el-form-item>
+					    	<el-form-item  class="notNeedValid" label="输出类型" prop="outputType">
+					    		<el-input style="margin-left: -8px;" v-model="algorithmInfoForm.outputType"></el-input>
+					    	</el-form-item>
+					    	<el-form-item  class="notNeedValid" label="算法描述" prop="description">
+					    		<el-input style="margin-left: -8px;" type="textarea" v-model="algorithmInfoForm.description"></el-input>
+					    	</el-form-item>
+					    </el-form>
+			    	</div>
+				</el-collapse-transition>
+			    <div class="tip-label" @click="uploadForm.isRunTimeInfoPanelActive=!uploadForm.isRunTimeInfoPanelActive">
+		    		运行信息
+		    		<i :class="[{'el-collapse-item__arrow el-icon-arrow-right is-active':uploadForm.isRunTimeInfoPanelActive},inactiveLogoClass]" style="float: right;"></i>
+		    	</div>
+		    	<el-collapse-transition>
+		    		<div v-show="uploadForm.isRunTimeInfoPanelActive">
+		    			<el-table style="width=100%" :data="runTimeInfoForm.runInfoTable">
+				    		<el-table-column label="包名">
+				    			<template slot-scope="scope">
+				    				<el-form :model="scope.row" :rules="algRunTimeInfoRules" ref="packageNameForm">
+				    					<el-form-item prop="packageName" style="margin-bottom: 16px;">
+				    						<el-input v-model="scope.row.packageName"  placeholder="请输入包名"/>
+				    					</el-form-item> 
+				    				</el-form>
+				    					   					
+				    			</template>
+				    		</el-table-column>
+				    		<el-table-column label="类名">
+				    			<template slot-scope="scope">
+				    				<el-form :model="scope.row" :rules="algRunTimeInfoRules" ref="classNameForm">
+				    					<el-form-item prop="className" style="margin-bottom: 16px;">
+				    						<el-input v-model="scope.row.className"  placeholder="请输入类名"/>
+				    					</el-form-item> 
+				    				</el-form>
+				    			</template>
+				    		</el-table-column>
+				    		<el-table-column label="方法名">
+				    			<template slot-scope="scope">
+				    				<el-form :model="scope.row" :rules="algRunTimeInfoRules" ref="methodNameForm">
+				    					<el-form-item prop="methodName" style="margin-bottom: 16px;">
+				    						<el-input v-model="scope.row.methodName"  placeholder="请输入方法名"/>
+				    					</el-form-item> 
+				    				</el-form>
+				    			</template>
+				    		</el-table-column>		    		
+			    		</el-table>
+			    
+				    	<el-table style="width=100%;" :data="algParameterForm.parameterTable">
+				    		<el-table-column label="参数名">
+				    			<template slot-scope="scope" >
+				    				<el-form :model="scope.row" :rules="algParameterRules" ref="parameterNameForm">
+					    				<el-form-item prop="parameterName" style="margin-bottom: 16px;" >
+					    				 	<el-input v-model="scope.row.parameterName"  placeholder="请输入参数名称"/>
+					    				</el-form-item>
+				    				</el-form>
+				    			</template>
+				    		</el-table-column>
+				    		<el-table-column label="默认值">
+				    			<template slot-scope="scope" >
+				    				 	<el-input v-model="scope.row.defaultValue"   style="margin-bottom: 16px;" placeholder="请输入默认值"/>
+				    			</template>
+				    		</el-table-column>
+				    		<el-table-column label="参数类型">
+				    			<template slot-scope="scope" >
+				    				<el-form :model="scope.row" :rules="algParameterRules" ref="parameterTypeForm">
+					    				<el-form-item  style="margin-bottom: 16px;" prop="parameterType">
+						    				<el-select filterable v-model="scope.row.parameterType" placeholder="请选择参数类型">
+						    					<el-option v-for="item in algParameterForm.algParameterType" :key="item.value" :label="item.label"  :value="item.value">
+						    					</el-option>
+						    				</el-select>
+					    				</el-form-item>
+				    				</el-form>
+				    			</template>
+				    		</el-table-column>
+				    		<el-table-column  align="center" width="60">
+			    				<template slot="header" slot-scope="scope" >
+			    					<div class="parameterBtn" @click="addOneRowParameter">
+			    						<i class="el-icon-plus" title="添加参数"></i>	
+			    					</div>	
+			    				</template>
+
+			    				<template slot-scope="scope">
+			    					<div class="parameterBtn" style="margin-bottom: 16px;" @click="deleteOneRowParameter(scope.$index)">
+			    						<i class="el-icon-close" title="删除此条参数"></i>
+			    					</div>
+			    				</template>
+
+				    		</el-table-column>
+			    		</el-table>  
+		    		</div>
+		    	</el-collapse-transition>			    
+		    </div> 		
+	        <div slot="footer" class="dialog-footer">
+	        	<el-button @click="updateForm.visible = false">取 消</el-button>
+	        	<!-- <el-button type="primary" @click="submitUpload()">确 定</el-button> -->
+	        	<el-button type="primary" @click="submitUpload(false)" :loading="uploadForm.isUploading">更新</el-button>
 	        </div>
   		</el-dialog>
 	</div>
@@ -338,6 +446,8 @@ import { queryAlgorithms } from '../../api/api'
 import {upload} from '../../api/api'
 import {deleteAlgorithm} from '../../api/api'
 import {updateAlgorithmAvailable} from '../../api/api'
+import { base } from '../../api/api'
+import {getAlgorithmInfo} from '../../api/api'
 import qs from 'qs'
 export default {
 	components:{	
@@ -357,9 +467,10 @@ export default {
 	        // }
       	}
       return {
-      	//控制折叠面板
-      	isBaseInfoPanelActive:true,
-      	isRunTimeInfoPanelActive:true,
+      	isDeleting:false,
+      	isDownloading:false,
+      
+      	
       	inactiveLogoClass:'el-collapse-item__arrow el-icon-arrow-right',
       	upload:'',
       	loading:true,
@@ -369,6 +480,29 @@ export default {
         // algorithmSet:['融合算法', '挖掘算法'],
         //上传算法界面的文件信息
         uploadForm: {
+        	//控制折叠面板
+      		isBaseInfoPanelActive:true,
+        	isRunTimeInfoPanelActive:true,
+        	//默认的上传文件区域的宽度，之后会随着页面的大小而自适应
+        	select_file_area_width:100,
+          	file: "",
+          	visible: false,
+          	dialogWidth: "30%",
+          	limit: 1,
+          	isFileListEmpty:false,
+          	//上传的文件列表
+       		fileList: [],
+
+       		//上传Jar是否成功
+       		isuploadSuccessed:false,
+       		//是否正在上传
+       		isUploading:false,
+        },
+        //上传算法界面的文件信息
+        updateForm: {
+        	//控制折叠面板
+      		isBaseInfoPanelActive:true,
+        	isRunTimeInfoPanelActive:true,
         	//默认的上传文件区域的宽度，之后会随着页面的大小而自适应
         	select_file_area_width:100,
           	file: "",
@@ -392,7 +526,7 @@ export default {
         	description:"",
         	//输出类型
         	outputType:"",
-        	type:"",
+        	type:1,
         },
         //算法运行时的信息表单
         runTimeInfoForm:{
@@ -494,7 +628,6 @@ export default {
     methods: {
     	test(value){
     		console.log(value)
-
     	},
     	//打开文件上传对话框时的回调函数
     	dialogOpen(){
@@ -507,25 +640,17 @@ export default {
     		//关闭上传成功的文件列表的显示
     		this.uploadForm.isuploadSuccessed = false
     		this.$nextTick(function() {
-    			
-    // 			//清空还原
-	   //  		this.uploadForm.isFileListEmpty = false
-	   //  		this.uploadForm.isUploading = false
-	   //  		this.$refs['uploadForm'].resetFields()
-				// this.$refs['algorithmInfoForm'].resetFields()
-				// this.$refs['packageNameForm'].resetFields()
-				// this.$refs['classNameForm'].resetFields()
-				// this.$refs['methodNameForm'].resetFields()
-	   //  		//清空算法参数表格
-	   //  		this.algParameterForm.parameterTable = []
     		})
     		
     	},
     	//关闭Jar文件上传对话框
     	closeUploadJarDialog(){
-    		this.isBaseInfoPanelActive=true,
-  			this.isRunTimeInfoPanelActive=true,
-  			this.resetAllForms()
+    		this.uploadForm.isBaseInfoPanelActive=true,
+  			this.uploadForm.isRunTimeInfoPanelActive=true,
+  			this.resetUploadForms()
+    	},
+    	closeUpdateJarDialog(){
+
     	},
     	//获取所有的算法信息
     	getAllAlgorithms(){
@@ -538,12 +663,68 @@ export default {
 	               return false
 	          	//获取成功
 	          	if(data.code === 1){
-	          		let algorithms = data.data.allAlgorithms
-	          		_this.tableData = algorithms
+	          	//	let algorithms = data.data.allAlgorithms
+	          		_this.tableData = []
+	          		let algorithms = []
+	          		let count = data.data.allAlgorithms.length
+	          		for(let i=0;i<count;i++)
+	          			if(data.data.allAlgorithms[i].algorithmType)
+	          				_this.tableData.push(data.data.allAlgorithms[i])
+	          		//_this.tableData = algorithms
 	          	}else{
 	          		this.$message.error('错误，获取算法失败.')
 	          	}   		
 	    	})
+    	},
+    	//更新算法界面
+    	update(index){
+    		this.updateForm.visible = !this.updateForm.visible
+    		this.algorithmInfoForm.name = this.tableData[index].algorithmName
+            this.algorithmInfoForm.outputType= this.tableData[index].algorithmOutputType
+			this.algorithmInfoForm.description= this.tableData[index].algorithmInformation
+            this.runTimeInfoForm.runInfoTable[0].packageName = this.tableData[index].algorithmPackage
+            this.runTimeInfoForm.runInfoTable[0].className = this.tableData[index].algorithmClassName
+            this.runTimeInfoForm.runInfoTable[0].methodName = this.tableData[index].algorithmMethod
+            let _this = this
+            let p={algoId:this.tableData[index].algorithmId}
+            getAlgorithmInfo(p).then(data=>{
+            	// //连接失败
+	            if (typeof (data) == "undefined")
+	               return false
+            	if(data.code === 1){
+            		if(data.data==null)
+            			return
+            		let params = data.data.params
+            		if(params!=null){		
+	            		let paramMap = {
+	                      0: '整型',
+	                      1: '浮点型',
+	                      2: '字符串',
+	                      3: '布尔型',
+	                    }
+	                    let count = params.length
+	                    for(let i=0;i<count;i++){
+	              	 		let type = ['整型','浮点型','字符型','布尔型']
+	                		//添加一条参数
+			    			let row = {parameterName:params[i].parameterName,defaultValue:params[i].defaultValue,parameterType:type[params[i].parameterType]}
+			    			_this.algParameterForm.parameterTable.push(row)
+	                	}
+            		}
+            		
+            	}
+            })
+       
+        //     if(params!=undefined &&params.length>0){
+        //     	let count = params.length
+        //       	 for(let i=0;i<count;i++){
+        //       	 	let type = ['整型','浮点型','字符型','布尔型']
+        //         	//添加一条参数
+		    		// let row = {parameterName:params[i].parameterName,defaultValue:params[i].defaultValue,parameterType:type[params[i].parameterType]}
+		    		// _this.algParameterForm.parameterTable.push(row)
+        //         }
+        //     }
+    		console.log(this.tableData[index])
+    		// let params = {algoId:_this.tableData[index].algorithmId}	
     	},
     	//刷新
     	refresh(){
@@ -580,7 +761,6 @@ export default {
     		// return {'color':'red','height':'40px','line-height':'40px'}
 		},
     	rowClass (object, index) {
-    	
     		let type = object.row.algorithmType
     		if(type==0)
       			return { "background-color": " 	#F5F5F5" }
@@ -601,7 +781,7 @@ export default {
         	return row.algorithmType === value;
       	},
       	//验证
-      	submitUpload(){
+      	submitUpload(isNeedJar){
       		let check_done = true
       		let formsName=[
       			'algorithmInfoForm','packageNameForm','classNameForm','methodNameForm'
@@ -624,12 +804,13 @@ export default {
 		   			})	
 		    	}
 		    }
-		
-		    if(this.uploadForm.fileList.length == 0){
-		    	this.uploadForm.isFileListEmpty = true
-		    	check_done = false
-		    	
-		    }
+			if(isNeedJar){
+				if(this.uploadForm.fileList.length == 0){
+			    	this.uploadForm.isFileListEmpty = true
+			    	check_done = false
+		    	}
+			}
+		   
 		    if(check_done){
 		    	this.$refs.upload.submit()
 		    }
@@ -642,7 +823,8 @@ export default {
       		this.uploadForm.isuploadSuccessed = false
       	},
       	//重置表单
-      	resetAllForms(){
+      	resetUploadForms(){
+      		console.log("reset")
       		this.uploadForm.isFileListEmpty = false
     		this.uploadForm.isUploading = false
     		this.$refs['uploadForm'].resetFields()
@@ -650,6 +832,14 @@ export default {
 			this.$refs['packageNameForm'].resetFields()
 			this.$refs['classNameForm'].resetFields()
 			this.$refs['methodNameForm'].resetFields()
+			this.algorithmInfoForm.name = ""
+			this.algorithmInfoForm.name = ""
+			this.algorithmInfoForm.outputType = ""
+			this.algorithmInfoForm.description = ""
+			this.algorithmInfoForm.type=='挖掘算法'
+			this.runTimeInfoForm.runInfoTable[0].packageName = ""
+			this.runTimeInfoForm.runInfoTable[0].className = ""
+			this.runTimeInfoForm.runInfoTable[0].methodName = ""
     		//清空算法参数表格
     		this.algParameterForm.parameterTable = []
     		this.$refs.upload.clearFiles()
@@ -661,14 +851,14 @@ export default {
       	},
       	//上传json配置文件，直接在前端读取
       	uploadConfigJson(){
+      		let _this = this
       		let objFile = document.getElementById("select_json_btn");
       		if(objFile.files.length!=0){
       			let file = objFile.files[0]
       			let name = file.name.substring(file.name.lastIndexOf('.') + 1)
 	        	if(name != 'json'){
 	        		this.$message.error('错误，文件格式只能为json.')
-	        		//清空
-	        		
+	        		//清空	        		
 	        	}else{
 	        		//新建一个FileReader
 	        		let reader = new FileReader()
@@ -676,9 +866,36 @@ export default {
 		            reader.readAsText(objFile.files[0], "UTF-8")
 		            //读取完文件之后会回来这里
 		            reader.onload = function(evt){ 
-		            	// 读取文件内容
-		                let jsonString = evt.target.result 
-		                console.log(jsonString)
+		            	try{
+		            		// 读取文件内容
+			                let jsonString = evt.target.result
+			                let jsonData = JSON.parse(jsonString)
+			              
+			                _this.algorithmInfoForm.name = jsonData['name']
+			                _this.algorithmInfoForm.outputType= jsonData['outputType']
+			                _this.algorithmInfoForm.description= jsonData['description']
+			                _this.runTimeInfoForm.runInfoTable[0].packageName = jsonData['packageName']
+			                _this.runTimeInfoForm.runInfoTable[0].className = jsonData['className']
+			                _this.runTimeInfoForm.runInfoTable[0].methodName = jsonData['methodName']
+
+			                let params = jsonData['params']
+			                if(params!=undefined &&params.length>0){
+			                	let count = params.length
+				              	 for(let i=0;i<count;i++){
+				              	 	let type = ['整型','浮点型','字符型','布尔型']
+				                	//添加一条参数
+						    		let row = {parameterName:params[i].parameterName,defaultValue:params[i].defaultValue,parameterType:params[i].parameterType}
+						    		_this.algParameterForm.parameterTable.push(row)
+				                }
+			                }else{
+			                	_this.algParameterForm.parameterTable = []
+			                }
+			               	
+		            	}catch(e){
+		            		_this.$message.error('配置文件出错,请检查.')
+		            		console.log(e)
+		            	}
+		            	
 		        	}
 	        	}
 
@@ -687,7 +904,6 @@ export default {
       	},
       	//上传文件
       	uploadFile(file) {
-
 	        let testmsg = file.name.substring(file.name.lastIndexOf('.') + 1)
 	        const extension = testmsg === 'jar'
 	    
@@ -713,7 +929,7 @@ export default {
 	            formData.append('outputType',this.algorithmInfoForm.outputType)
 	            formData.append('desc',this.algorithmInfoForm.description)
 
-	            formData.append('type',this.algorithmInfoForm.type=='挖掘算法')
+	            formData.append('type',true)
 
 	            formData.append('packName',this.runTimeInfoForm.runInfoTable[0].packageName)
 	            formData.append('className',this.runTimeInfoForm.runInfoTable[0].className)
@@ -722,6 +938,7 @@ export default {
 	            // formData.append('parameterList',this.algParameterForm.parameterTable)
 	            upload(formData).then(data=>{
 	            	this.uploadForm.isUploading = false
+	            	let _this = this
 		          	if(!data){
 		          		return
 		          	}
@@ -732,35 +949,13 @@ export default {
 				          message: '上传文件成功！',
 				          type: 'success'
 				        })
+				        _this.getAllAlgorithms()
+				        _this.uploadForm.visible = false
 		          	}else{
 		          		let msg = data.msg
 		          		this.$message.error('错误，${msg}.')
 		          	}
 	          })
-	          // formData.append('format', testmsg)
-	          // formData.append('projectId', this.currentProject.pid)
-	          // uploadEventLog(formData).then(data => {
-	          //   if (typeof (data) == "undefined") {
-	          //     return
-	          //   }
-	          //   if (data.code == 1) {
-	          //     this.$notify({
-	          //       title: '提示',
-	          //       message: '上传成功！',
-	          //       type: 'success'
-	          //     })
-	          //     this.uploadForm.visible = false
-	          //     let createdTime = timestamp2Time(data.data.EventLogCreatetime)
-	          //     let EventLog = { eventLogId: data.data.eventlogId, EventLog: data.data.EventLogName, rawLog: data.data.rawlog, eventLog: data.data.eventlog, createdTime: createdTime }
-	          //     this.log.push(EventLog)
-	          //   }
-	          //   if (data.code == -1) {
-	          //     this.$notify.error({
-	          //       title: '提示',
-	          //       message: data.msg
-	          //     })
-	          //   }
-	          // })
 	        }
 	        return extension
       	},
@@ -773,6 +968,14 @@ export default {
     	deleteOneRowParameter(index){
     		this.algParameterForm.parameterTable.splice(index, 1)
     	},
+    	
+    	//下载算法
+        downloadAlgorithm(index){
+        	let algoId =  this.tableData[index].algorithmId
+        	if(algoId){
+        		window.open(`${base}/algorithmAction/download?algoId=${algoId}`) 
+        	}
+        },
     	//删除算法
       	deleteAlgorithm(index){
       		let _this = this
@@ -781,12 +984,14 @@ export default {
 	          '提示',
 	          { type: 'warning' }
 	        ).then(() => {
+	        _this.isDeleting = true
 	        let params = {algoId:_this.tableData[index].algorithmId}	
 	        deleteAlgorithm(params).then(data => {
+	        	_this.isDeleting = false
 	            if (typeof (data) === "undefined")
 	              return
-	            if (data.code === 1) {
-	              _this.getAllAlgorithms
+	            if (data.code == 1) {
+	              _this.getAllAlgorithms()
 	            } else {
 	              this.$notify.error({
 	                title: '提示',

@@ -37,8 +37,8 @@
 					</el-form>
 					</el-tab-pane>
 					<el-tab-pane label="密码设置" name="1">
-					<el-form :model="accountCogForm" label-width="90px">
-						<el-form-item label="旧密码">
+					<el-form :model="accountCogForm" label-width="90px" :rules="passwordRules">
+						<el-form-item label="旧密码" prop="oldPass">
 						<el-input type="password" v-model="accountCogForm.oldPass"></el-input>
 						</el-form-item>
 						<el-form-item label="新密码">
@@ -48,7 +48,7 @@
 						<el-input type="password" v-model="accountCogForm.newPassCheck"></el-input>
 						</el-form-item>
 						<el-form-item style="margin-top:30px;">
-						<el-button type="primary" style="width:100%">保存</el-button>
+						<el-button type="primary" style="width:100%" :disabled="canChangePass">保存</el-button>
 						</el-form-item>
 					</el-form>
 					</el-tab-pane>
@@ -59,15 +59,29 @@
 </template>
 <script >
 	import breadcrumb from "../breadcrumb/index.vue"
+	const md5 = require('js-md5')
 	export default{
 		name:'topbar',
 		components:{
 			'breadcrumb':breadcrumb,
 		},
 		data(){
+			var validateOldPass = (rule, value, callback) => {
+		        if (value === '') {
+		          callback(new Error('请输入旧密码'));
+		        } else {
+		          if(md5(value).toUpperCase()!=this.oldPass){
+		          	console.log(this.oldPass)
+		          	callback(new Error('与当前密码不一致'))
+		          }
+		        
+		          callback();
+		        }
+		    }
 			return{
 				userName:"",
 				email:"",
+				oldPass:"",
 				accountCogForm:{
 					visible:false,
 					activeName:'0',
@@ -77,6 +91,11 @@
 					newPass:'',
 					newPassCheck:'',
 				}, 
+				canChangePass:true,
+				passwordRules: {
+		          oldPass: [
+		            { validator: validateOldPass, trigger: 'blur' }
+		        ],}
 			}
 		},
 		computed:{
@@ -92,6 +111,7 @@
 				let user = JSON.parse(sessionStorage.getItem('user'))
 				this.userName = user.nickname
 				this.email = user.email
+				this.oldPass = user.password
       		})  
     	},
 		methods:{
@@ -127,7 +147,7 @@
 </script>
 <style lang="scss" scoped>
 #topbar{
-	z-index:10;
+	z-index: 2;
 	position: fixed;
 	left: 200px;
 	width:100%;

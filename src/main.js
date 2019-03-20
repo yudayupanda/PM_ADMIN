@@ -31,7 +31,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   //测试，直接跳转到首页
-  NProgress.start();
+  NProgress.start()
   if (to.path == '/login') {
     sessionStorage.removeItem('user');
   }

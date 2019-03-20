@@ -1,6 +1,6 @@
 <template>
   <div class="main-container">
-    <div class="title">流程挖掘后台管理系统</div>
+    <div class="title">流程挖掘算法管理与应用系统</div>
     <div class="login-container">
       <el-form :model="userForm" :rules="rules" ref="userForm"  class="demo-userForm">
          <span class="login-title">登录</span>
@@ -60,8 +60,9 @@
         this.$refs['userForm'].validate((valid) => {
           if(valid){
             this.logining = true
-            let md5Pass = md5(this.userForm.password).toUpperCase()
-            let params={email:this.userForm.email,password:md5Pass}
+           let md5Pass = md5(this.userForm.password).toUpperCase()
+           let params={email:this.userForm.email,password:md5Pass}
+          //let params={email:this.userForm.email,password:this.userForm.password}
             requestLogin(params).then(res=>{
               this.logining = false
               if (typeof(res) == "undefined")

@@ -268,6 +268,7 @@ export default {
       left:200px;
       right: 0px;
       top:60px;
+      bottom:0px;
       box-sizing: border-box;
       transition: all 0.5s;
       padding: 10px;

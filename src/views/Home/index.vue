@@ -1,16 +1,16 @@
 <template>
 	<section>
 		<div class="heading">
-			更新日志
-			<el-button style="float: right;">Github Releases</el-button>
+			介绍
+			<!-- <el-button style="float: right;">Github Releases</el-button> -->
 		</div>
 		<div class="versionHeading">
 			<span class="version">1.0.0</span>
-			<span class="date">2019-01-25</span>
+			<span class="date">2019-02-25</span>
 		</div>
 		<div class="content">
-			<div class="update">用户管理功能 : 新增、删除、更新用户</div>
 			<div class="update">插件管理功能 : 上传、删除、更新插件</div>
+			<div class="update">日志挖掘功能 : 对用户上传的事件日志，采用已上传的流程挖掘算法进行挖掘，并展示挖掘模型</div>
 		</div>
 	</section>
 </template>
